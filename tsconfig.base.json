@@ -30,7 +30,15 @@
         "name": "@effect/language-service",
         "diagnostics": false,
         "namespaceImportPackages": ["effect"],
-        "allowedUnstableApis": ["effect/http", "@effect/vitest"]
+        "allowedUnstableApis": [
+          "effect/http",
+          "effect/cli",
+          "effect/process",
+          "effect/FileSystem",
+          "effect/Path",
+          "@effect/platform-node",
+          "@effect/vitest"
+        ]
       }
     ]
   },

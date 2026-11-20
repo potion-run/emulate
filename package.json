@@ -1,5 +1,5 @@
 {
-  "name": "alchemy-emulate",
+  "name": "@potion-run/emulate",
   "version": "0.1.0",
   "description": "emulate for the alchemy stack: drop-in API emulators as Effect-native platform layers, with typed errors and layer-owned lifecycle.",
   "keywords": [
@@ -10,8 +10,16 @@
     "infrastructure-as-code",
     "testing"
   ],
+  "homepage": "https://github.com/potion-run/emulate#readme",
+  "bugs": {
+    "url": "https://github.com/potion-run/emulate/issues"
+  },
   "license": "Apache-2.0",
   "author": "Nafees Nazik",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/potion-run/emulate.git"
+  },
   "files": [
     "lib",
     "src",
@@ -53,6 +61,7 @@
     "lint": "oxlint -c oxlint.config.ts",
     "lint:types": "effect-tsgo diagnostics --project tsconfig.json --strict --format text",
     "prepublishOnly": "pnpm check && pnpm build",
+    "release:notes": "node scripts/release/release-notes.ts",
     "test": "vitest run",
     "typecheck": "tsrs -p tsconfig.json",
     "vendor:agent-sources": "./scripts/vendor-agent-sources.sh",
@@ -62,6 +71,7 @@
     "emulate": "0.14.0"
   },
   "devDependencies": {
+    "@effect/platform-node": "4.1.4",
     "@effect/tsgo": "0.73.2",
     "@effect/vitest": "4.1.5",
     "@enfect/oxlint": "0.10.0",
@@ -70,6 +80,7 @@
     "@types/node": "26.6.6",
     "@typescript-eslint/parser": "8.73.0",
     "alchemy": "2.0.0-beta.87",
+    "changelogen": "0.6.2",
     "effect": "4.1.4",
     "eslint-plugin-ai-guard": "1.4.7",
     "oxfmt": "0.79.0",

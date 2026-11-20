@@ -33,6 +33,14 @@ jobs:
             exit 1
           fi
 
+      - name: Changelog has this tag
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if ! grep -q "^## v${version}$" CHANGELOG.md; then
+            echo "CHANGELOG.md has no '## v${version}' section. Fix: run pnpm release:notes v${version} and commit the result." >&2
+            exit 1
+          fi
+
       - name: Gate
         run: pnpm check
 

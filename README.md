@@ -1,4 +1,4 @@
-# alchemy-emulate
+# @potion-run/emulate
 
 [emulate](https://github.com/vercel-labs/emulate) for the
 [alchemy](https://alchemy.run) / [Effect](https://effect.website) stack: drop-in
@@ -10,18 +10,19 @@ The API follows alchemy's own integration shape — `@alchemy.run/better-auth`'s
 the same composition point: the impl effect of a Worker, Function, or test.
 
 ```bash
-pnpm add alchemy-emulate emulate effect
+pnpm add @potion-run/emulate emulate effect
 ```
 
-`alchemy-emulate` depends on `emulate` and peers on `effect` `4.1.4`; install
-`effect` yourself so one copy serves the whole app. The alchemy resource peers
-on `alchemy` (optional — the runtime half works without it), so a stack project
-that declares emulators installs alchemy anyway and needs nothing extra.
+`@potion-run/emulate` depends on `emulate` and peers on `effect` `4.1.4`;
+install `effect` yourself so one copy serves the whole app. The alchemy resource
+peers on `alchemy` (optional — the runtime half works without it), so a stack
+project that declares emulators installs alchemy anyway and needs nothing
+extra.
 
 ## Quick start
 
 ```typescript
-import { Emulate, InProcess } from "alchemy-emulate";
+import { Emulate, InProcess } from "@potion-run/emulate";
 import * as Effect from "effect/Effect";
 
 const program = Effect.gen(function* () {
@@ -47,7 +48,7 @@ const program = Effect.gen(function* () {
 server — a Cloudflare Worker, a Lambda, a CI job that runs `pnpm exec emulate`:
 
 ```typescript
-import { Connect, Emulate } from "alchemy-emulate";
+import { Connect, Emulate } from "@potion-run/emulate";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import * as Layer from "effect/Layer";
 
@@ -68,7 +69,7 @@ function of the ambient `Database`. Provide the platform on the impl effect of
 the resource that needs the emulated API:
 
 ```typescript
-import { Emulate, InProcess } from "alchemy-emulate";
+import { Emulate, InProcess } from "@potion-run/emulate";
 import * as Effect from "effect/Effect";
 
 Effect.gen(function* () {
@@ -89,8 +90,8 @@ Declare the emulated API in the stack, bind its URL into a Worker's `env`, and
 the emulator's lifecycle is alchemy's:
 
 ```typescript
-import { EmulateService } from "alchemy-emulate/EmulateService";
-import { providers } from "alchemy-emulate/Providers";
+import { EmulateService } from "@potion-run/emulate/EmulateService";
+import { providers } from "@potion-run/emulate/Providers";
 
 export default Alchemy.Stack(
   "MyStack",
@@ -143,11 +144,11 @@ end to end.
 
 ## API
 
-The runtime half ships from the barrel (`alchemy-emulate`); the alchemy half
-ships from subpath modules (`alchemy-emulate/EmulateService`,
-`alchemy-emulate/Providers`), so a runtime-only consumer never has to install
-`alchemy` — the same split alchemy's own packages apply to driver layers with
-optional peers.
+The runtime half ships from the barrel (`@potion-run/emulate`); the alchemy
+half ships from subpath modules (`@potion-run/emulate/EmulateService`,
+`@potion-run/emulate/Providers`), so a runtime-only consumer never has to
+install `alchemy` — the same split alchemy's own packages apply to driver
+layers with optional peers.
 
 | Export                                        | What it is                                                                                          |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -192,12 +193,13 @@ authenticate only from `seed.tokens` report an empty list.
 ## Development
 
 ```bash
-pnpm install         # installs, then patches oxlint + tsrs with @effect/tsgo
-pnpm check           # lint + format + typecheck + Effect diagnostics
-pnpm fix             # apply safe lint and format fixes
-pnpm test            # vitest, including live in-process emulators
-pnpm build           # compile lib/ and verify the publish map
-pnpm pack            # inspect the published tarball
+pnpm install                   # installs, then patches oxlint + tsrs
+pnpm check                     # lint + format + typecheck + Effect diagnostics
+pnpm fix                       # apply safe lint and format fixes
+pnpm test                      # vitest, including live in-process emulators
+pnpm build                     # compile lib/ and verify the publish map
+pnpm pack                      # inspect the published tarball
+pnpm release:notes v<version>  # prepend a tag's notes to CHANGELOG.md
 ```
 
 The resource's lifecycle (restart on seed change, guarded delete, dual

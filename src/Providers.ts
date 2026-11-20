@@ -23,7 +23,7 @@ export class Providers extends Provider.ProviderCollection<Providers>()("Emulate
  * ```typescript
  * import * as Alchemy from "alchemy";
  * import * as Cloudflare from "@alchemy.run/cloudflare";
- * import { providers } from "alchemy-emulate/Providers";
+ * import { providers } from "@potion-run/emulate/Providers";
  *
  * export default Alchemy.Stack(
  *   "MyStack",

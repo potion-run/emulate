@@ -1,5 +1,5 @@
 /**
- * Package build for `alchemy-emulate`.
+ * Package build for `@potion-run/emulate`.
  *
  * In the workspace this package resolves from `src/*.ts`: `exports` points
  * straight at source, so consumers and linked checkouts need no build. A

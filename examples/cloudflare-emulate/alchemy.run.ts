@@ -1,7 +1,7 @@
 import * as Cloudflare from "@alchemy.run/cloudflare";
+import { EmulateService } from "@potion-run/emulate/EmulateService";
+import { providers } from "@potion-run/emulate/Providers";
 import * as Alchemy from "alchemy";
-import { EmulateService } from "alchemy-emulate/EmulateService";
-import { providers } from "alchemy-emulate/Providers";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 

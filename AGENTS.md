@@ -1,7 +1,8 @@
 # Repository law
 
-`alchemy-emulate` is one published package: **emulate**'s local API emulators
-(GitHub, Vercel, Google, Slack, Stripe, …) behind alchemy-shaped Effect layers.
+`@potion-run/emulate` is one published package: **emulate**'s local API
+emulators (GitHub, Vercel, Google, Slack, Stripe, …) behind alchemy-shaped
+Effect layers.
 The public contract is `README.md`; this file is how to change it without
 breaking it.
 
@@ -73,6 +74,11 @@ Alchemy's package conventions, applied to a single package at the repo root:
   `test/fixtures/` if a test needs one.
 - `scripts/build.ts` — the only build entry; `scripts/vendor-agent-sources.sh`
   refreshes mirrors.
+- `scripts/release/` — the changelog generator copied from alchemy
+  (`changelog.ts` reads the commit range through changelogen's parser,
+  `render.ts` renders it, `release-notes.ts` prepends a tag's section to
+  `CHANGELOG.md`). Run it via `pnpm release:notes <tag>`; it owns no state and
+  only edits `CHANGELOG.md`.
 - `package.json` — source-first `exports` (`./src/*.ts`) plus
   `publishConfig.exports` mapping to `lib/`, `files: ["lib", "src", "NOTICE",
   "README.md"]`, `build:package` for the compile step. Copy it, don't invent a
@@ -147,15 +153,24 @@ must contain `lib/`, `src/`, `NOTICE`, `NOTICE` again under `lib/`, `LICENSE`,
 and `README.md`. `scripts/build.ts` fails when `publishConfig.exports` names a
 file the build did not produce.
 
-Bump `version` in `package.json`; there is no changelog tool. `.github/workflows/publish.yml`
-publishes on a `v<version>` tag that matches the manifest, using npm trusted
-publishing (OIDC, no token in the repo). Publishing and version numbers need
-owner sign-off.
+Bump `version` in `package.json`, then generate the entry before tagging:
+
+```bash
+pnpm release:notes v<version>
+```
+
+The generator covers commits since the previous tag (or all of them on the
+first release), skips a tag `CHANGELOG.md` already documents, and links the
+compare URL from `EMULATE_REPO` (`potion-run/emulate` by default). Commit the
+changelog with the version bump. `.github/workflows/publish.yml` publishes on a
+`v<version>` tag that matches the manifest, using npm trusted publishing (OIDC,
+no token in the repo). Publishing and version numbers need owner sign-off.
 
 ## Boundaries
 
 - Direct: source, tests, docs, this file, `.agent_sources/README.md`, the vendor
-  script, `tools/oxlint/anti-slop/` while keeping its `UPSTREAM.md` current.
+  script, `scripts/release/`, `tools/oxlint/anti-slop/` while keeping its
+  `UPSTREAM.md` current.
 - Ask first: adding or changing a dependency or pin, changing the publish map or
   `files`, disabling a lint rule repo-wide, adding a platform layer that owns a
   new kind of process, and anything that changes the public API's shape.
