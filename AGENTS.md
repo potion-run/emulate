@@ -1,6 +1,6 @@
 # Repository law
 
-`@potion-run/emulate` is one published package: **emulate**'s local API
+`@potion.run/emulate` is one published package: **emulate**'s local API
 emulators (GitHub, Vercel, Google, Slack, Stripe, …) behind alchemy-shaped
 Effect layers.
 The public contract is `README.md`; this file is how to change it without

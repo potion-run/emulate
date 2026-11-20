@@ -1,4 +1,4 @@
-# @potion-run/emulate
+# @potion.run/emulate
 
 Local API emulators for [Alchemy](https://alchemy.run) and
 [Effect](https://effect.website). Run GitHub, Vercel, Google, Slack, Stripe, and
@@ -6,7 +6,7 @@ other third-party APIs in tests and under `alchemy dev`, wired as Effect
 platform layers with typed errors and layer-owned lifecycle.
 
 ```sh
-npm install alchemy @potion-run/emulate emulate effect
+npm install alchemy @potion.run/emulate emulate effect
 ```
 
 `effect` 4.1.4 is a peer dependency. `alchemy` is optional: drop it when you
@@ -17,7 +17,7 @@ transport.
 A test that seeds a GitHub token and calls the emulated API:
 
 ```typescript
-import { Emulate, InProcess } from "@potion-run/emulate";
+import { Emulate, InProcess } from "@potion.run/emulate";
 import * as Effect from "effect/Effect";
 
 const program = Effect.gen(function* () {
@@ -88,8 +88,8 @@ Worker's `env`:
 
 ```typescript
 import * as Cloudflare from "@alchemy.run/cloudflare";
-import { EmulateService } from "@potion-run/emulate/EmulateService";
-import { providers } from "@potion-run/emulate/Providers";
+import { EmulateService } from "@potion.run/emulate/EmulateService";
+import { providers } from "@potion.run/emulate/Providers";
 import * as Alchemy from "alchemy";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -149,7 +149,7 @@ flow end to end.
 a server: a Cloudflare Worker, a Lambda, or a CI job that runs `npx emulate`.
 
 ```typescript
-import { Connect, Emulate } from "@potion-run/emulate";
+import { Connect, Emulate } from "@potion.run/emulate";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import * as Layer from "effect/Layer";
 
@@ -194,7 +194,7 @@ authenticate only from `seed.tokens` report an empty list.
 
 `Emulate`, `Emulator`, `InProcess`, `Connect`, the handle, and the errors ship
 from the package root. The Alchemy half ships from subpaths:
-`@potion-run/emulate/EmulateService` and `@potion-run/emulate/Providers`. A
+`@potion.run/emulate/EmulateService` and `@potion.run/emulate/Providers`. A
 runtime-only consumer never installs `alchemy`. Alchemy's own packages use the
 same split for driver layers with optional peers.
 

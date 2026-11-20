@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Test from "@alchemy.run/test/Bun";
-import { providers } from "@potion-run/emulate/Providers";
+import { providers } from "@potion.run/emulate/Providers";
 import * as Alchemy from "alchemy";
 import * as Data from "effect/Data";
 import * as Effect from "effect/Effect";

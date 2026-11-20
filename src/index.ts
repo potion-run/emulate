@@ -25,6 +25,6 @@ export type { ServiceConfigs, ServiceName, ServiceOptions } from "./ServiceOptio
 // consumers — Effect tests, non-alchemy apps — must not be forced to
 // install). One module per entry point, the same doctrine alchemy's own
 // packages apply to their optional-peer driver layers:
-//   @potion-run/emulate/EmulateService      — the `Emulate.Service` resource + providers
-//   @potion-run/emulate/EmulateServiceLocal — the dev sidecar's provider group module
-//   @potion-run/emulate/Providers           — the stack `providers()` layer
+//   @potion.run/emulate/EmulateService      — the `Emulate.Service` resource + providers
+//   @potion.run/emulate/EmulateServiceLocal — the dev sidecar's provider group module
+//   @potion.run/emulate/Providers           — the stack `providers()` layer

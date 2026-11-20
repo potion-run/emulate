@@ -66,7 +66,7 @@ const configuredEntries = <Configs extends ServiceConfigs>(
  * ```
  *
  * @layer
- * @requires @potion-run/emulate/Emulator
+ * @requires @potion.run/emulate/Emulator
  */
 export const Emulate = <const Configs extends ServiceConfigs>(
   options: EmulateOptions<Configs>,

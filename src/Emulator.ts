@@ -51,5 +51,5 @@ export interface EmulatorService {
 
 /** The emulator platform `Emulate` requires. */
 export class Emulator extends Context.Service<Emulator, EmulatorService>()(
-  "@potion-run/emulate/Emulator",
+  "@potion.run/emulate/Emulator",
 ) {}

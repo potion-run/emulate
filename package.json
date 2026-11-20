@@ -1,6 +1,6 @@
 {
-  "name": "@potion-run/emulate",
-  "version": "0.1.0",
+  "name": "@potion.run/emulate",
+  "version": "0.1.1",
   "description": "emulate for the alchemy stack: drop-in API emulators as Effect-native platform layers, with typed errors and layer-owned lifecycle.",
   "keywords": [
     "alchemy",
