@@ -68,12 +68,14 @@ EFFECT_VERSION="$(node -p "require('${ROOT}/package.json').peerDependencies.effe
 # ref is the release the API was designed against.
 ALCHEMY_REF="v2.0.0-beta.87"
 
+# emulate's GitHub tags are `v<version>`, so the dependency pin is the ref.
+EMULATE_VERSION="$(node -p "require('${ROOT}/package.json').dependencies.emulate")"
+
 clone_source Effect-TS effect https://github.com/Effect-TS/effect.git "effect@${EFFECT_VERSION}" \
   "Effect v4 monorepo matching the effect peer pin. Read src/http, src/Context.ts, src/Layer.ts."
 clone_source alchemy-run alchemy https://github.com/alchemy-run/alchemy.git "${ALCHEMY_REF}" \
   "Alchemy matching ${ALCHEMY_REF}. Read packages/better-auth/src for the integration shape this package follows."
+clone_source vercel-labs emulate https://github.com/vercel-labs/emulate.git "v${EMULATE_VERSION}" \
+  "emulate matching the emulate dependency pin. Read packages/emulate/src for service, seed, and lifecycle behavior."
 
-# emulate is installed from npm (node_modules/emulate), so its published
-# dist/api.d.ts is the runtime contract. It is not mirrored here: the published
-# types are authoritative and cheap to read.
 echo "done — agent sources under ${PREFIX}"
