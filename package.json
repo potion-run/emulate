@@ -1,0 +1,102 @@
+{
+  "name": "alchemy-emulate",
+  "version": "0.1.0",
+  "description": "emulate for the alchemy stack: drop-in API emulators as Effect-native platform layers, with typed errors and layer-owned lifecycle.",
+  "keywords": [
+    "alchemy",
+    "effect",
+    "emulate",
+    "emulator",
+    "infrastructure-as-code",
+    "testing"
+  ],
+  "license": "Apache-2.0",
+  "author": "Nafees Nazik",
+  "files": [
+    "lib",
+    "src",
+    "NOTICE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./lib/index.d.ts",
+        "bun": "./src/index.ts",
+        "worker": "./src/index.ts",
+        "default": "./lib/index.js"
+      },
+      "./*": {
+        "types": "./lib/*.d.ts",
+        "bun": "./src/*.ts",
+        "worker": "./src/*.ts",
+        "default": "./lib/*.js"
+      },
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/build.ts",
+    "build:package": "node scripts/build.ts",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm lint:types",
+    "fix": "oxlint -c oxlint.config.ts --fix && oxfmt",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint -c oxlint.config.ts",
+    "lint:types": "effect-tsgo diagnostics --project tsconfig.json --strict --format text",
+    "prepublishOnly": "pnpm check && pnpm build",
+    "test": "vitest run",
+    "typecheck": "tsrs -p tsconfig.json",
+    "vendor:agent-sources": "./scripts/vendor-agent-sources.sh",
+    "prepare": "effect-tsgo patch --oxlint --tsrs --no-typescript --skip-missing"
+  },
+  "dependencies": {
+    "emulate": "0.14.0"
+  },
+  "devDependencies": {
+    "@effect/tsgo": "0.73.2",
+    "@effect/vitest": "4.1.5",
+    "@enfect/oxlint": "0.10.0",
+    "@interfere/landmines": "0.1.1",
+    "@oxlint/plugins": "1.94.0",
+    "@types/node": "26.6.6",
+    "@typescript-eslint/parser": "8.73.0",
+    "effect": "4.1.4",
+    "eslint-plugin-ai-guard": "1.4.7",
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0",
+    "oxlint-plugin-effect": "0.32.4",
+    "oxlint-tsgolint": "7.0.2007",
+    "tsrs": "7.1.0-beta.tsrs3",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  },
+  "peerDependencies": {
+    "effect": "4.1.4"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.3.0",
+      "onFail": "warn"
+    },
+    "runtime": {
+      "name": "node",
+      "version": ">=24.18.0",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">=24.18.0",
+    "pnpm": ">=11.1.2"
+  },
+  "packageManager": "pnpm@11.3.0"
+}

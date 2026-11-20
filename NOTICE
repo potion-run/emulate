@@ -1,0 +1,12 @@
+alchemy-emulate
+Copyright 2026 Nafees Nazik
+
+This product vendors the anti-slop Oxlint rules by Dillon Mulroy, as
+maintained by Kyle Mistele (https://github.com/K-Mistele/anti-slop), under the
+MIT License. The vendored copy lives in tools/oxlint/anti-slop/, together with
+its LICENSE, README, and the license for the ESLint Stylistic code that
+`require-readable-spacing` derives from.
+
+This product depends on emulate (https://github.com/vercel-labs/emulate),
+licensed under the Apache License, Version 2.0, and on the Effect library
+(https://effect.website), licensed under the MIT License.

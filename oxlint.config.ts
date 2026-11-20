@@ -1,0 +1,167 @@
+import { presets } from "@effect/tsgo/oxlint-presets";
+import { defineConfig } from "oxlint";
+
+const effectTsgoRules = Object.values(presets).flatMap((preset) => Object.keys(preset.rules ?? {}));
+
+export default defineConfig({
+  extends: Object.values(presets),
+  ignorePatterns: [
+    "lib/**",
+    "node_modules/**",
+    ".agent_sources/**",
+    "tools/oxlint/**",
+    "**/fixtures/**",
+    "*.config.ts",
+  ],
+  jsPlugins: [
+    { name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" },
+    {
+      name: "anti-slop-effect",
+      specifier: "./tools/oxlint/anti-slop/effect/index.ts",
+    },
+    {
+      name: "anti-slop-martinfowler",
+      specifier: "./tools/oxlint/anti-slop/martinfowler/index.ts",
+    },
+    { name: "landmines", specifier: "@interfere/landmines/testing" },
+    { name: "effect", specifier: "oxlint-plugin-effect/plugin" },
+    { name: "enfect", specifier: "@enfect/oxlint" },
+    { name: "ai-guard", specifier: "eslint-plugin-ai-guard" },
+  ],
+  options: {
+    reportUnusedDisableDirectives: "error",
+    typeAware: true,
+    typeCheck: false,
+  },
+  rules: {
+    ...Object.fromEntries(effectTsgoRules.map((rule) => [rule, "error"])),
+    "effecttsgo/effect-fn-opportunity": "off",
+    // effect 4 marks every effect/http type unstable. This package's public
+    // surface follows the runtime's HTTP client (`HttpClient`) instead of
+    // duplicating it, and effect is pinned exactly, so a leak check would only
+    // flag a dependency the caller already has.
+    "effecttsgo/api-stability-leak": "off",
+    "effecttsgo/lazy-effect": "off",
+    "effecttsgo/strict-effect-provide": "off",
+
+    "oxc/no-accumulating-spread": "error",
+    complexity: ["warn", { max: 15 }],
+    "typescript/no-non-null-assertion": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+      },
+    ],
+
+    "anti-slop/max-ternary-depth": ["error", { maxDepth: 2 }],
+    "anti-slop/no-array-filter-map": "error",
+    "anti-slop/no-chained-type-assertions": "error",
+    "anti-slop/no-conditional-spread": "error",
+    "anti-slop/no-dev-env-branch": "error",
+    "anti-slop/no-disabled-type-assertion-rules": "error",
+    "anti-slop/no-instanceof": "error",
+    "anti-slop/no-known-value-widening": "error",
+    "anti-slop/no-module-mocking": "error",
+    "anti-slop/no-object-parameters": "error",
+    "anti-slop/no-reduce-accumulator-copy": "error",
+    "anti-slop/no-reflect-apply": "error",
+    "anti-slop/no-reflect-get": "error",
+    "anti-slop/no-reprovide-ambient-service": "error",
+    "anti-slop/no-runtime-typeof": "error",
+    "anti-slop/no-shape-in-symbol-names": "error",
+    "anti-slop/no-unknown-parameters": "error",
+    "anti-slop/no-unknown-returns": "error",
+    "anti-slop/no-unknown-type-aliases": "error",
+    "anti-slop/no-unsafe-dictionary-type": "error",
+    "anti-slop/no-widen-then-assert": "error",
+    "anti-slop/require-readable-spacing": "error",
+    "anti-slop/require-safety-comment-for-type-assertion": "error",
+
+    "landmines/strict-msw": "error",
+    "landmines/no-fixed-sleep": "error",
+    "landmines/no-unsignaled-poll": "error",
+    "landmines/no-flake-masking": "error",
+
+    "ai-guard/no-placeholder-implementation": "error",
+    "ai-guard/no-test-env-branch": "error",
+    "ai-guard/no-tautological-assertion": "error",
+    "ai-guard/no-assertionless-test": "error",
+    "ai-guard/no-undeclared-import": "error",
+    "ai-guard/no-silent-fallback": "error",
+
+    "anti-slop-effect/no-manual-effect-error-tag": "error",
+    "anti-slop-effect/no-manual-tag-comparison": "error",
+    "anti-slop-effect/no-manual-tagged-construction": "error",
+    "anti-slop-effect/no-manual-tagged-type": "error",
+    "anti-slop-effect/no-ordie-in-service-construction": "error",
+    "anti-slop-effect/no-service-constructor-imports": "error",
+    "anti-slop-effect/no-service-parameters": "error",
+    "anti-slop-effect/no-static-effect-service-forwarders": "error",
+    "anti-slop-effect/no-test-code-in-src": "error",
+    "anti-slop-effect/no-unbounded-retry": "error",
+    "anti-slop-effect/prefer-effect-match": "error",
+    "anti-slop-effect/prefer-tagged-error-handling": "error",
+    "anti-slop-effect/prefer-yield-service": "error",
+    "anti-slop-effect/require-cause-when-narrowing": "error",
+    "anti-slop-effect/require-operation-span": "error",
+    "anti-slop-effect/require-service-make-layer": "error",
+    "anti-slop-effect/stream-large-files": "error",
+    "anti-slop-effect/throw-in-effect-gen": "error",
+
+    "effect/noAliasTestLayer": "error",
+    "effect/noEagerAcquire": "error",
+    "effect/noManagedRuntimeInEffect": "error",
+    "effect/noPerCallCacheConstruction": "error",
+    "effect/noPointFreeLog": "error",
+    "effect/noRunCollectOnUnboundedStream": "error",
+    "effect/noSilentCatchAll": "error",
+    "effect/noUnboundedConcurrency": "error",
+    "effect/requireSuppressionReason": "error",
+    "effect/requireForceKillAfter": "error",
+
+    "enfect/effect-promise-vs-trypromise": "error",
+    "enfect/prefer-redacted-config": "error",
+    "enfect/avoid-option-getorthrow": "error",
+    "enfect/effect-run-in-body": "error",
+    "enfect/no-cause-in-http-response": "error",
+    "enfect/no-effect-ignore-then-as": "error",
+    "enfect/avoid-expect-in-if": "error",
+    "enfect/yield-in-for-loop": "warn",
+    "enfect/prefer-duration-constructors": "error",
+    "enfect/avoid-mutable-state": "error",
+    "enfect/prefer-option-over-null": "error",
+
+    "anti-slop-martinfowler/global-data": "warn",
+    "anti-slop-martinfowler/long-function": "warn",
+    "anti-slop-martinfowler/long-parameter-list": "warn",
+    "anti-slop-martinfowler/loops": "warn",
+    "anti-slop-martinfowler/mutable-data": "warn",
+    "anti-slop-martinfowler/mysterious-name": "warn",
+    "anti-slop-martinfowler/repeated-switches": "warn",
+  },
+  overrides: [
+    {
+      files: ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      rules: {
+        complexity: "off",
+        "anti-slop-effect/throw-in-effect-gen": "off",
+        "effect/noUnboundedConcurrency": "off",
+        "enfect/effect-promise-vs-trypromise": "off",
+        "enfect/avoid-option-getorthrow": "off",
+        "enfect/effect-run-in-body": "off",
+      },
+    },
+    {
+      files: ["scripts/**", "*.config.ts"],
+      rules: {
+        "effecttsgo/node-builtin-import": "off",
+        "effecttsgo/schema-sync": "off",
+        "enfect/effect-run-in-body": "off",
+        "no-console": "off",
+      },
+    },
+  ],
+});

@@ -1,0 +1,20 @@
+node_modules/
+lib/
+dist/
+coverage/
+*.tgz
+
+# Reference-only upstream source mirrors. Never a runtime dependency.
+.agent_sources/github.com/
+
+# Local tool output
+.alchemy/
+.emulate/
+.turbo/
+*.tsbuildinfo
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json
