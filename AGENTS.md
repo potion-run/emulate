@@ -64,7 +64,11 @@ Alchemy's package conventions, applied to a single package at the repo root:
 
 - `src/<PascalCase>.ts` — one concern per module, named for the thing it
   exports (`Emulate.ts`, `InProcess.ts`). No `index.ts` per folder.
-- `src/index.ts` — the barrel; every public name appears there.
+- `src/index.ts` — the barrel; every public name appears there. One documented
+  exception: modules that carry an optional peer (`EmulateService.ts`,
+  `Providers.ts` carry `alchemy`) stay out of the barrel and ship from
+  subpaths, so runtime-only consumers never need that peer — the same doctrine
+  `@alchemy.run/better-auth` applies to its driver layers.
 - `test/<Name>.test.ts` — beside `src/`, driving the public API. Fixtures under
   `test/fixtures/` if a test needs one.
 - `scripts/build.ts` — the only build entry; `scripts/vendor-agent-sources.sh`

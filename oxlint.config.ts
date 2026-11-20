@@ -12,6 +12,9 @@ export default defineConfig({
     "tools/oxlint/**",
     "**/fixtures/**",
     "*.config.ts",
+    // Examples are runnable documentation with their own installs (cloudflare,
+    // bun-test) — not part of this package's shipped source or its gate.
+    "examples/**",
   ],
   jsPlugins: [
     { name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" },

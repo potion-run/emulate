@@ -69,6 +69,7 @@
     "@oxlint/plugins": "1.94.0",
     "@types/node": "26.6.6",
     "@typescript-eslint/parser": "8.73.0",
+    "alchemy": "2.0.0-beta.87",
     "effect": "4.1.4",
     "eslint-plugin-ai-guard": "1.4.7",
     "oxfmt": "0.79.0",
@@ -80,7 +81,13 @@
     "vitest": "5.1.1"
   },
   "peerDependencies": {
+    "alchemy": "^2.0.0-beta.87",
     "effect": "4.1.4"
+  },
+  "peerDependenciesMeta": {
+    "alchemy": {
+      "optional": true
+    }
   },
   "devEngines": {
     "packageManager": {

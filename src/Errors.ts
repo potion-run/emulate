@@ -54,6 +54,20 @@ export class EmulateExternalConfigError extends Schema.TaggedError<
   message: Schema.String,
 }) {}
 
+/**
+ * An `Emulate.Service` resource was reconciled by the live provider without a
+ * deploy-time `url`. Emulators only run under `alchemy dev`; a deploy needs
+ * the real endpoint the resource stands in for.
+ */
+export class EmulateDeployUrlError extends Schema.TaggedError<
+  EmulateDeployUrlError,
+  { readonly brand: unique symbol }
+>()("EmulateDeployUrlError", {
+  id: Schema.String,
+  service: Schema.String,
+  message: Schema.String,
+}) {}
+
 /** Every failure this package can produce. */
 export type EmulateError =
   | EmulateStartError

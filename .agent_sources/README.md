@@ -20,7 +20,7 @@ Refs are derived from this repository's pins by
 | Path | Upstream | Ref | Why |
 | --- | --- | --- | --- |
 | `github.com/Effect-TS/effect` | https://github.com/Effect-TS/effect.git | `effect@4.1.4` | Effect v4: `Context.Service`, `Layer`, `Schema.TaggedError`, `effect/http` |
-| `github.com/alchemy-run/alchemy` | https://github.com/alchemy-run/alchemy.git | `v2.0.0-beta.87` | The integration shape this package follows: `packages/better-auth` (options-in / layers-on-the-impl pattern), `Local/ProviderLayer` (dev-mode resources), `scripts/package-build.ts` (publish map) |
+| `github.com/alchemy-run/alchemy` | https://github.com/alchemy-run/alchemy.git | `v2.0.0-beta.87` | The integration shape this package follows: `packages/better-auth` (options-in / layers-on-the-impl pattern), `Command/Dev` + `Local/LocalProvider` + `Local/ProviderLayer` (the `Emulate.Service` dev resource's lifecycle: dual live/local providers, sidecar provider groups), `packages/rivet` + `packages/neon` (`providers()` stack layer convention), `scripts/package-build.ts` (publish map) |
 | `github.com/vercel-labs/emulate` | https://github.com/vercel-labs/emulate.git | `v0.14.0` | Source behind the emulated services: `packages/emulate/src` service, seed, and lifecycle behavior. The published `node_modules/emulate/dist/api.d.ts` remains the runtime contract. |
 
 Inspect before non-trivial Effect work. Prefer these mirrors over `node_modules`

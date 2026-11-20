@@ -1,3 +1,11 @@
+packages:
+  - examples/*
+
+# workerd ships its platform binary through a postinstall; the local
+# Cloudflare Worker runtime in examples/* needs it built.
+allowBuilds:
+  workerd: true
+
 minimumReleaseAgeExclude:
   - "@effect/tsgo-darwin-arm64@0.73.2"
   - "@effect/tsgo-darwin-x64@0.73.2"

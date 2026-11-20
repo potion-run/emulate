@@ -14,7 +14,9 @@ pnpm add alchemy-emulate emulate effect
 ```
 
 `alchemy-emulate` depends on `emulate` and peers on `effect` `4.1.4`; install
-`effect` yourself so one copy serves the whole app.
+`effect` yourself so one copy serves the whole app. The alchemy resource peers
+on `alchemy` (optional — the runtime half works without it), so a stack project
+that declares emulators installs alchemy anyway and needs nothing extra.
 
 ## Quick start
 
@@ -76,28 +78,91 @@ Effect.gen(function* () {
 }).pipe(Effect.provide(InProcess()));
 ```
 
-That is the whole integration seam: no environment variables to hand-wire, no
+That is the whole runtime seam: no environment variables to hand-wire, no
 process management in the app, and the emulator's lifetime is the layer's.
 
-> **Not in this release:** an `alchemy dev` resource (`ProviderLayer.dual` +
-> `LocalProvider.make`) that declares the emulators in a Stack and binds their
-> URLs into a Worker's environment. The platform layers above are the runtime
-> half it would build on; the resource belongs in its own release with
-> `alchemy dev` lifecycle tests.
+## The resource: declaring emulators in a stack
+
+`EmulateService` is the `alchemy dev` half — the resource alchemy itself would
+write for a dev-only dependency, the same way `Command.Dev` wraps a dev server.
+Declare the emulated API in the stack, bind its URL into a Worker's `env`, and
+the emulator's lifecycle is alchemy's:
+
+```typescript
+import { EmulateService } from "alchemy-emulate/EmulateService";
+import { providers } from "alchemy-emulate/Providers";
+
+export default Alchemy.Stack(
+  "MyStack",
+  {
+    providers: Layer.mergeAll(Cloudflare.providers(), providers()),
+    state: Alchemy.localState(),
+  },
+  Effect.gen(function* () {
+    const github = yield* EmulateService("github", {
+      service: "github",
+      // the endpoint a deploy reports, since no emulator runs then
+      url: "https://api.github.com",
+      dev: { seed: { tokens: { ghp_test: { login: "octocat" } } } },
+    });
+
+    const worker = yield* Cloudflare.Worker("api", {
+      main: "./src/worker.ts",
+      env: { GITHUB_API_URL: github.url, GITHUB_TOKEN: "ghp_test" },
+    });
+
+    return { url: worker.url.as<string>() };
+  }),
+);
+```
+
+Under `alchemy dev` the emulator runs in the dev sidecar (`ProviderLayer.dual`
+
+- `LocalProvider.make`, the machinery behind every alchemy local provider): one
+  instance per resource for the session's lifetime, restarted when the seed or
+  port changes, closed on destroy — and its URL binds into whatever consumes it,
+  no redeploys needed. `dev: { mode: "external" }` is the resource's `Connect`:
+  adopt the URL of an emulator you run yourself.
+
+Under `alchemy deploy` the emulator is inert and the resource reports the real
+endpoint from `url`. A deploy without `url` fails with
+`EmulateDeployUrlError` instead of silently dropping the binding out of the
+worker that needs it. `Alchemy.remote()` opts a resource out of emulation; a
+destroy deletes a dev-created row with the dev provider, whatever the run's
+current mode.
+
+The runtime seam and the resource stay symmetric: `dev: { mode: "emulator" }`
+is `InProcess()`, `dev: { mode: "external" }` is `Connect()`, and the same
+typed errors name the same failures on both halves.
+
+A runnable version of the snippet above lives in
+[`examples/cloudflare-emulate`](./examples/cloudflare-emulate) — a Worker that
+calls the GitHub API, with a test that runs the real `alchemy dev` topology
+(emulator in the sidecar, worker in local workerd) and asserts the seeded flow
+end to end.
 
 ## API
 
-| Export                       | What it is                                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------------------------- |
-| `Emulate({ services })`      | Effect that starts (or attaches to) every configured service and returns a typed handle per service |
-| `InProcess()`                | Platform layer that starts emulators in this process (Node)                                         |
-| `Connect({ service: url })`  | Platform layer for servers that are already running; requires an `HttpClient`                       |
-| `EmulatorHandle`             | Per service: `url`, `secrets`, `reset`, `request(path, options?)`                                   |
-| `EmulateStartError`          | The emulator failed to start (port in use, non-Node runtime, bad seed)                              |
-| `EmulateUnknownServiceError` | No emulator configured for that service                                                             |
-| `EmulateRequestError`        | The request to the emulator failed, or the client cannot return a web `Response`                    |
-| `EmulateResetError`          | Reset failed, or the platform does not own the emulator                                             |
-| `EmulateExternalConfigError` | `Connect` was given options only the server can apply                                               |
+The runtime half ships from the barrel (`alchemy-emulate`); the alchemy half
+ships from subpath modules (`alchemy-emulate/EmulateService`,
+`alchemy-emulate/Providers`), so a runtime-only consumer never has to install
+`alchemy` — the same split alchemy's own packages apply to driver layers with
+optional peers.
+
+| Export                                        | What it is                                                                                          |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `Emulate({ services })`                       | Effect that starts (or attaches to) every configured service and returns a typed handle per service |
+| `InProcess()`                                 | Platform layer that starts emulators in this process (Node)                                         |
+| `Connect({ service: url })`                   | Platform layer for servers that are already running; requires an `HttpClient`                       |
+| `EmulatorHandle`                              | Per service: `url`, `secrets`, `reset`, `request(path, options?)`                                   |
+| `EmulateService(id, { service, url?, dev? })` | The alchemy resource: the emulated API under `alchemy dev`, the real endpoint on deploy             |
+| `providers()`                                 | The stack providers layer registering the `Emulate.Service` provider                                |
+| `EmulateStartError`                           | The emulator failed to start (port in use, non-Node runtime, bad seed)                              |
+| `EmulateUnknownServiceError`                  | No emulator configured for that service                                                             |
+| `EmulateRequestError`                         | The request to the emulator failed, or the client cannot return a web `Response`                    |
+| `EmulateResetError`                           | Reset failed, or the platform does not own the emulator                                             |
+| `EmulateExternalConfigError`                  | `Connect` was given options only the server can apply                                               |
+| `EmulateDeployUrlError`                       | A deploy was asked for the endpoint but the resource has no `url`                                   |
 
 ### Requests
 
@@ -133,6 +198,16 @@ pnpm fix             # apply safe lint and format fixes
 pnpm test            # vitest, including live in-process emulators
 pnpm build           # compile lib/ and verify the publish map
 pnpm pack            # inspect the published tarball
+```
+
+The resource's lifecycle (restart on seed change, guarded delete, dual
+provider-mode routing) is tested by driving the generated provider service
+directly, the same way alchemy tests `LocalProvider.make`. The example's own
+test goes one level further — the real `alchemy dev` topology with the sidecar —
+and runs from the example directory:
+
+```bash
+cd examples/cloudflare-emulate && bun test
 ```
 
 `.agent_sources/README.md` explains how to vendor the Effect and alchemy source
