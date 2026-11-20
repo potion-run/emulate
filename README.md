@@ -35,8 +35,8 @@ const program = Effect.gen(function* () {
 By default, `InProcess()` starts each emulator in this process on an ephemeral
 port. It closes the emulator when the layer's scope closes. The port is `0` by
 default, so several services and test files never collide on `emulate`'s
-default port, `4000`. Two `Emulate` calls against one platform layer share the instance, its
-URL, and its state.
+default port, `4000`. Two `Emulate` calls against one platform layer share the
+instance, its URL, and its state.
 
 `Emulate` reads the ambient platform, so provide the layer on the effect that
 needs the emulator: a test, a script, or a resource impl.
@@ -53,6 +53,32 @@ needs the emulator: a test, a script, or a resource impl.
   It runs under `alchemy dev` and reports the real endpoint on deploy.
 - **Typed errors** are `Schema.TaggedError` values, and each message names the
   fix.
+
+## Supported platforms
+
+`Emulate({ services })` accepts one key per platform:
+
+| Platform                                                                            | `service`    | What it emulates                                                                 |
+| ----------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------- |
+| [Vercel](https://emulate.dev/docs/vercel)                                           | `vercel`     | Users, teams, projects, deployments, domains, environment variables, Blob        |
+| [GitHub](https://emulate.dev/docs/github)                                           | `github`     | Users, repos, issues, pull requests, Actions, checks, webhooks, OAuth, apps      |
+| [Google](https://emulate.dev/docs/google)                                           | `google`     | OAuth, Gmail, Calendar, Drive                                                    |
+| [Slack](https://emulate.dev/docs/slack)                                             | `slack`      | Auth, chat, conversations, users, files, events, interactivity, OAuth            |
+| [Apple](https://emulate.dev/docs/apple)                                             | `apple`      | Sign in with Apple                                                               |
+| [Microsoft](https://emulate.dev/docs/microsoft)                                     | `microsoft`  | Microsoft Entra ID                                                               |
+| [Okta](https://emulate.dev/docs/okta)                                               | `okta`       | Users, groups, apps, authorization servers, OAuth                                |
+| [AWS](https://emulate.dev/docs/aws)                                                 | `aws`        | S3, SQS, IAM, STS, KMS, Cognito                                                  |
+| [Resend](https://emulate.dev/docs/resend)                                           | `resend`     | Emails, batch sends, idempotency, contacts, domains, API keys                    |
+| [Stripe](https://emulate.dev/docs/stripe)                                           | `stripe`     | Products, prices, customers, payments, Checkout, webhooks                        |
+| [MongoDB Atlas](https://emulate.dev/docs/mongoatlas)                                | `mongoatlas` | Projects, clusters, database users, Data API                                     |
+| [Clerk](https://github.com/vercel-labs/emulate/tree/main/packages/@emulators/clerk) | `clerk`      | Users, email addresses, sessions, organizations, memberships, invitations, OAuth |
+| [Linear](https://emulate.dev/docs/linear)                                           | `linear`     | GraphQL, OAuth, agent sessions, webhooks                                         |
+| [Twilio](https://emulate.dev/docs/twilio)                                           | `twilio`     | Messages, calls, conversations, Verify, phone numbers                            |
+| [AI](https://emulate.dev/docs/ai)                                                   | `ai`         | OpenAI and Anthropic chat, streams, tools, structured output                     |
+
+The table is a summary. Each link documents the routes and seed shape the
+platform accepts. Clerk has no docs page yet, so its link points at the
+emulator source.
 
 ## Use it under `alchemy dev`
 
@@ -166,20 +192,22 @@ authenticate only from `seed.tokens` report an empty list.
 
 ## API
 
-`Emulate`, `InProcess`, `Connect`, the handle, and the errors ship from the
-package root. The Alchemy half ships from subpaths:
+`Emulate`, `Emulator`, `InProcess`, `Connect`, the handle, and the errors ship
+from the package root. The Alchemy half ships from subpaths:
 `@potion-run/emulate/EmulateService` and `@potion-run/emulate/Providers`. A
 runtime-only consumer never installs `alchemy`. Alchemy's own packages use the
 same split for driver layers with optional peers.
 
-| Export                      | What it is                                                                                   |
-| --------------------------- | -------------------------------------------------------------------------------------------- |
-| `Emulate({ services })`     | Effect that starts or attaches to each configured service and returns one handle per service |
-| `InProcess()`               | Layer that starts emulators in this process. Requires Node                                   |
-| `Connect(urls)`             | Layer that attaches to running emulators. Requires an `HttpClient`                           |
-| `EmulatorHandle`            | Per service: `url`, `secrets`, `reset`, `request(path, options?)`                            |
-| `EmulateService(id, props)` | Alchemy resource: the emulator under `alchemy dev`, the real endpoint on deploy              |
-| `providers()`               | Stack layer that registers the `Emulate.Service` provider                                    |
+| Export                               | What it is                                                                                   |
+| ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `Emulate({ services })`              | Effect that starts or attaches to each configured service and returns one handle per service |
+| `InProcess()`                        | Layer that starts emulators in this process. Requires Node                                   |
+| `Connect(urls)`                      | Layer that attaches to running emulators. Requires an `HttpClient`                           |
+| `Emulator`                           | The platform service `Emulate` requires. `InProcess()` and `Connect()` provide it            |
+| `EmulatorHandle`                     | Per service: `url`, `secrets`, `reset`, `request(path, options?)`                            |
+| `EmulatorService`, `RunningEmulator` | The interface a custom platform implements, and the running emulator it returns              |
+| `EmulateService(id, props)`          | Alchemy resource: the emulator under `alchemy dev`, the real endpoint on deploy              |
+| `providers()`                        | Stack layer that registers the `Emulate.Service` provider                                    |
 
 ### Service options
 
@@ -205,6 +233,28 @@ port, not the host string.
 | `EmulateResetError`          | Reset failed, or the platform does not own the emulator              |
 | `EmulateExternalConfigError` | `Connect` was given options only the server can apply                |
 | `EmulateDeployUrlError`      | A deploy needs the endpoint, but the resource has no `url`           |
+
+## Package reference
+
+`Emulator` is the platform seam. `Emulate` reads it, and `InProcess()` or
+`Connect()` provides it. A custom platform implements `EmulatorService`:
+`acquire(name, options)` returns a `RunningEmulator` and must cache one
+instance per service name for the layer's lifetime.
+
+The emulated HTTP behavior comes from
+[`emulate`](https://github.com/vercel-labs/emulate). This package wraps it and
+adds the Effect layers and the Alchemy resource. The upstream reference
+documents the parts this package does not restate:
+
+| Reference                                                     | What it covers                                                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [`createEmulator`](https://emulate.dev/docs/programmatic-api) | The underlying call: options, `url`, `generatedSecrets`, `reset`, `close` |
+| [Configuration](https://emulate.dev/docs/configuration)       | The `SeedConfig` shape: `tokens` and per-service state                    |
+| [CLI](https://emulate.dev/docs#cli)                           | `npx emulate`, for `Connect()` and `dev: { mode: "external" }`            |
+| [Service docs](https://emulate.dev/docs)                      | Routes, seeds, and limits for each platform                               |
+
+`Emulate` and `EmulateService` take `emulate`'s built-in service names. Custom
+emulators from `defineEmulator` are not part of this package's service map.
 
 ## Handle errors
 
